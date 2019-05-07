@@ -71,11 +71,10 @@ comment             \/\/[^\n]*
 "]"                                      return fecha_col;
 "("                                      return abre_par;
 ")"                                      return fecha_par;
-"\""                                     return aspas;
 "*"                                      return op_arit_mult;
 "/"                                      return op_arit_div;
 "+"                                      return op_arit_adi;
-"-"                                      return op_ari_sub;
+"-"                                      return op_arit_sub;
 "="                                      return op_atrib;
 "=="                                     return op_rel_igual;
 "!="                                     return op_rel_naoigual;
@@ -98,7 +97,7 @@ void yywarning(char* str) {
     printf("Warning! Na linha %d!\n", yylineno);
 }
 
-int yywrap(void) {}
+int yywrap(void) { return 1; }
 
 int main (int num_args, char **args) {
     if (num_args != 2) exit(0);

@@ -24,8 +24,8 @@ void UnknownVarError(std::string s);
 %token <str_val> const_lit identificador
 
 %token <int_val> ponto virgula ponto_virgula dois_pontos abre_col fecha_col
-%token <int_val> abre_par fecha_par aspas num_inteiro 
-%token <int_val> op_arit_mult op_arit_div op_arit_adi op_ari_sub
+%token <int_val> abre_par fecha_par num_inteiro
+%token <int_val> op_arit_mult op_arit_div op_arit_adi op_arit_sub
 %token <int_val> op_atrib op_rel_igual op_rel_naoigual op_rel_maior
 %token <int_val> op_rel_maiorigual op_rel_menor op_rel_menorigual
 %token <int_val> op_log_nao op_log_and op_log_or pr_algoritmo
@@ -35,10 +35,8 @@ void UnknownVarError(std::string s);
 %token <int_val> pr_passo pr_faca pr_fim_para pr_enqto pr_fim_enqto pr_repita
 %token <int_val> pr_abs pr_trunca pr_resto pr_declare abra_par fechar_par
 
-%token <int_val> op_arit_adicao op_arit_expo op_arit_rad op_logico_and
-%token <int_val> op_logico_or op_rel_maiorque op_rel_menorque
 %token <int_val> pr_entrada pr_fim_funcao pr_fim_procmto pr_funcao
-%token <int_val> pr_procmto pr_saida op_arit_subtracao
+%token <int_val> pr_procmto pr_saida
 
 %start ALGO
 
@@ -62,14 +60,15 @@ TIPO:              pr_logico
                    | identificador
                    | REG;
 REG:               pr_registro abra_par DECL fecha_par;
-CMDS:              pr_leia L_VAR
-                   | pr_escreva L_ESC
-                   | identificador op_atrib EXP
-                   | pr_se COND pr_entao CMDS SEN pr_fim_se
-                   | pr_para identificador op_atrib EXP_A pr_ate EXP_A pr_passo EXP_A pr_faca CMDS pr_fim_para
-                   | pr_enqto COND CMDS pr_fim_enqto
-                   | pr_repita CMDS pr_ate COND
-                   | identificador abre_par L_VAR fecha_par;
+CMDS:              pr_leia L_VAR CMDS
+                   | pr_escreva L_ESC CMDS
+                   | identificador op_atrib EXP CMDS
+                   | pr_se COND pr_entao CMDS SEN pr_fim_se CMDS
+                   | pr_para identificador op_atrib EXP_A pr_ate EXP_A pr_passo EXP_A pr_faca CMDS pr_fim_para CMDS
+                   | pr_enqto COND CMDS pr_fim_enqto CMDS
+                   | pr_repita CMDS pr_ate COND CMDS
+                   | identificador abre_par L_VAR fecha_par CMDS
+                   | %empty;
 L_VAR:             VAR L_VRS;
 L_VRS:             virgula VAR
                    | %empty;
@@ -101,17 +100,15 @@ EXP_A:             TERM_A MULDIV EXP_A
                    | TERM_A;
 TERM_A:            FAT_A ADISUB TERM_A
                    | FAT_A;
-FAT_A:             EXP_A op_arit_expo EXP_A
-                   | EXP_A op_arit_rad EXP_A
-                   | abre_par EXP_A fecha_par
+FAT_A:             abre_par EXP_A fecha_par
                    | FUNC abre_par L_VAR fecha_par
                    | VAR
                    | num_inteiro
                    | num_real;
 MULDIV:            op_arit_mult
                    | op_arit_div;
-ADISUB:            op_arit_adicao
-                   | op_arit_subtracao;
+ADISUB:            op_arit_adi
+                   | op_arit_sub;
 FUNC:              pr_abs
                    | pr_trunca
                    | pr_resto
@@ -124,13 +121,13 @@ EXP_L:             REL OP_LOG EXP_L
 REL:               FAT_R OP_REL FAT_R;
 FAT_R:             FAT_A
                    | const_lit;
-OP_LOG:            op_logico_and
-                   | op_logico_or;
+OP_LOG:            op_log_and
+                   | op_log_or;
 OP_REL:            op_rel_igual
                    | op_rel_naoigual
-                   | op_rel_maiorque
+                   | op_rel_maior
                    | op_rel_maiorigual
-                   | op_rel_menorque
+                   | op_rel_menor
                    | op_rel_menorigual;
 COND:              abre_par EXP_L fecha_par;
 
