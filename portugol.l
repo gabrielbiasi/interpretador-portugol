@@ -43,7 +43,7 @@ comment             \/\/[^\n]*
 "para"                                   return pr_para;
 "ate"                                    return pr_ate;
 "passo"                                  return pr_passo;
-"faça"                                   return pr_faca;
+"faca"                                   return pr_faca;
 "fim_para"                               return pr_fim_para;
 "enquanto"                               return pr_enqto;
 "fim_enquanto"                           return pr_fim_enqto;

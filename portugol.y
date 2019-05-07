@@ -33,7 +33,7 @@ void UnknownVarError(std::string s);
 %token <int_val> pr_real pr_caracter pr_registro pr_leia
 %token <int_val> pr_escreva pr_se pr_entao pr_senao pr_fim_se pr_para pr_ate
 %token <int_val> pr_passo pr_faca pr_fim_para pr_enqto pr_fim_enqto pr_repita
-%token <int_val> pr_abs pr_trunca pr_resto pr_declare abra_par fechar_par
+%token <int_val> pr_abs pr_trunca pr_resto pr_declare
 
 %token <int_val> pr_entrada pr_fim_funcao pr_fim_procmto pr_funcao
 %token <int_val> pr_procmto pr_saida
@@ -59,13 +59,13 @@ TIPO:              pr_logico
                    | pr_real
                    | identificador
                    | REG;
-REG:               pr_registro abra_par DECL fecha_par;
+REG:               pr_registro abre_par DECL fecha_par;
 CMDS:              pr_leia L_VAR CMDS
                    | pr_escreva L_ESC CMDS
                    | identificador op_atrib EXP CMDS
                    | pr_se COND pr_entao CMDS SEN pr_fim_se CMDS
                    | pr_para identificador op_atrib EXP_A pr_ate EXP_A pr_passo EXP_A pr_faca CMDS pr_fim_para CMDS
-                   | pr_enqto COND CMDS pr_fim_enqto CMDS
+                   | pr_enqto COND pr_faca CMDS pr_fim_enqto CMDS
                    | pr_repita CMDS pr_ate COND CMDS
                    | identificador abre_par L_VAR fecha_par CMDS
                    | %empty;
@@ -77,7 +77,7 @@ IND:               abre_col EXP_A fecha_col IND
                    | ponto identificador IND
                    | %empty;
 L_ESC:             const_lit L_ESCS
-                   | VAR L_ESCS;
+                   | EXP_A L_ESCS;
 L_ESCS:            virgula L_ESC
                    | %empty;
 SEN:               pr_senao CMDS
@@ -101,7 +101,7 @@ EXP_A:             TERM_A MULDIV EXP_A
 TERM_A:            FAT_A ADISUB TERM_A
                    | FAT_A;
 FAT_A:             abre_par EXP_A fecha_par
-                   | FUNC abre_par L_VAR fecha_par
+                   | FUNC abre_par L_ESC fecha_par
                    | VAR
                    | num_inteiro
                    | num_real;
@@ -116,7 +116,7 @@ FUNC:              pr_abs
 
 
 EXP_L:             REL OP_LOG EXP_L
-                   | op_log_nao abre_par REL fechar_par
+                   | op_log_nao abre_par EXP_L fecha_par
                    | REL;
 REL:               FAT_R OP_REL FAT_R;
 FAT_R:             FAT_A
