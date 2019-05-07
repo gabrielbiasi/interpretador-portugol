@@ -1,0 +1,67 @@
+algoritmo TESTE
+
+funcao calculamedia
+	entrada n1: REAL, n2: REAL
+	saida resultado: REAL
+	resultado = (n1 + n2) / 2
+fim_funcao
+
+procedimento exemplo
+	entrada letra: CARACTER, idade: INTEIRO
+	escreva "A letra ", letra, " possui ", idade, " anos.\n"
+fim_procedimento
+
+inicio
+	// teste de comentário
+	declare i, quant: INTEIRO;
+	declare media, temp, notas[1..100]: REAL;
+	declare nome[1..200]: CARACTER;
+
+	declare livro1, livro2: REGISTRO (declare titulo[1..50]: CARACTER; declare id: INTEIRO; );
+	declare carro: REGISTRO (declare marca[1..35]: CARACTER; declare modelo[1..50]: CARACTER; );
+
+	escreva "Escreva seu nome:\n"
+	leia nome
+
+	escreva "Entre com a quantidade de notas (max 100):"
+	leia quant
+	
+	se (quant >= 1 && quant <= 100) entao
+
+		para i = 1 ate quant passo 1 faca
+			repita
+				escreva "Entre com a nota ", i, ": \n"
+				leia notas[i]
+				se (!(notas[i] >= 0 && notas[i] <= 10)) entao
+					escreva "nota incorreta!\n"
+				fim_se
+			ate (notas[i] >= 0 && notas[i] <= 10)
+		fim_para
+
+		escreva "Lista das Notas:\n"
+		i = 1
+		enquanto (i <= quant) faca
+			escreva "Nota ", i, ": ", notas[i], "\n"
+			i = i+1
+		fim_enquanto
+	
+		temp = 0
+		para i = 1 ate quant passo 1 faca
+			temp = temp + notas[i]
+		fim_para
+		media = temp / quant
+		
+		escreva "\nmedia: [", media, "]\n\n"
+		se (media >= TRUNCA(6)) entao
+			escreva "ALUNO APROVADO!\n"
+		senao
+			escreva "ALUNO REPROVADO!\n"
+		fim_se
+
+		escreva "Fim do acesso do usuário ", nome, ".\n"
+
+	senao
+		escreva "Quantidade de alunos invalida!!"
+	fim_se
+
+fim_algoritmo
