@@ -8,7 +8,7 @@ using namespace std;
 
 map<std::string, double> vars;
 extern int yylex();
-extern void yyerror(char *);
+extern void yyerror(std::string);
 void DivError(void);
 void UnknownVarError(std::string s);
 %}
@@ -16,7 +16,7 @@ void UnknownVarError(std::string s);
 %union {
     int     int_val;
     double  double_val;
-    std::string* str_val;
+    char* str_val;
 }
 
 %token <double_val> num_real
@@ -38,10 +38,10 @@ void UnknownVarError(std::string s);
 %token <int_val> pr_entrada pr_fim_funcao pr_fim_procmto pr_funcao
 %token <int_val> pr_procmto pr_saida
 
-%start ALGO
+%start INICIO
 
 %%
-
+INICIO:            ALGO { printf("Sucesso!\n"); };
 ALGO:              pr_algoritmo identificador PROCS pr_inicio DECL CMDS pr_fim_algo;
 DECL:              pr_declare L_IDS dois_pontos TIPO ponto_virgula DECL
                    | %empty;

@@ -7,8 +7,8 @@
 using namespace std;
 
 void yyparser(void);
-void yyerror(char*);
-void yywarning(char*);
+void yyerror(std::string);
+void yywarning(std::string);
 
 %}
 
@@ -89,11 +89,11 @@ comment             \/\/[^\n]*
 
 %%
 
-void yyerror(char *str) {
+void yyerror(std::string str) {
     printf("Error! Na linha %d!\n", yylineno);
 }
 
-void yywarning(char* str) {
+void yywarning(std::string str) {
     printf("Warning! Na linha %d!\n", yylineno);
 }
 
