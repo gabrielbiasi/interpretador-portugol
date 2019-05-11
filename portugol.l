@@ -10,6 +10,8 @@ void yyparser(void);
 void yyerror(std::string);
 void yywarning(std::string);
 
+FILE *output;
+
 %}
 
 %option yylineno
@@ -59,9 +61,9 @@ comment             \/\/[^\n]*
 "procedimento"                           return pr_procmto;
 "fim_procedimento"                       return pr_fim_procmto;
 
-{identificador}                          return identificador;
-{num_inteiro}                            return num_inteiro;
-{num_real}                               return num_real;
+{identificador}                          {yylval.str_val = strdup(yytext); return identificador;};
+{num_inteiro}                            {yylval.str_val = strdup(yytext); return num_inteiro;};
+{num_real}                               {yylval.str_val = strdup(yytext); return num_real;};
 {const_lit}                              return const_lit;
 "."                                      return ponto;
 ","                                      return virgula;
@@ -102,8 +104,10 @@ int yywrap(void) { return 1; }
 int main (int num_args, char **args) {
     if (num_args != 2) exit(0);
     FILE *file = fopen(args[1], "r");
+    output = fopen("output.py", "w");
     if (file == NULL) exit(0);
     yyin = file;
     yyparse();
     fclose(file);
+    fclose(output);
 }

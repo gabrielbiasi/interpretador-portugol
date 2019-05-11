@@ -2,4 +2,4 @@ lex.yy.c
 portugol
 portugol.tab.c
 portugol.tab.h
-
+output.py

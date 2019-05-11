@@ -4,4 +4,4 @@ all:
 	g++ -o portugol lex.yy.c portugol.tab.c
 	
 clean:
-	rm -f portugol lex.yy.c *.tab.*
+	rm -f portugol lex.yy.c *.tab.* output.py
