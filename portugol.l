@@ -64,7 +64,7 @@ comment             \/\/[^\n]*
 {identificador}                          {yylval.str_val = strdup(yytext); return identificador;};
 {num_inteiro}                            {yylval.str_val = strdup(yytext); return num_inteiro;};
 {num_real}                               {yylval.str_val = strdup(yytext); return num_real;};
-{const_lit}                              return const_lit;
+{const_lit}                              {yylval.str_val = strdup(yytext); return const_lit;};
 "."                                      return ponto;
 ","                                      return virgula;
 ";"                                      return ponto_virgula;
