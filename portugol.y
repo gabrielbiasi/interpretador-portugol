@@ -4,18 +4,38 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
-#include <vector>
+#include <map>
 
 using namespace std;
 
-std::vector<char*> var_table;
+std::map<char*, int> var_table;
 extern int yylineno;
 extern FILE* output;
 extern int yylex();
 extern void yyerror(std::string);
 void AddVarTable(char*);
+void AddVarType(int);
+const char* PrintVarType(char*);
 void CheckVarTable(char*);
 void PrintVarTable();
+
+#define TIPO_VOID 0
+#define TIPO_LOGICO 1
+#define TIPO_INTEIRO 2
+#define TIPO_REAL 3
+#define TIPO_CARACTER 4
+#define TIPO_REGISTRO 5
+
+const char* str_logico = "bool";
+const char* str_inteiro = "int";
+const char* str_real = "float";
+const char* str_caracter = "str";
+const char* str_registro = "dict";
+
+const char* header = "\
+def TRUNCA(n):\n    return int(n)\n\n\
+def ABS(n):\n    return n if n >= 0 else -n\n\n\
+def RESTO(n, d):\n    return n % d\n\n";
 
 int nivel = 0;
 void Tab();
@@ -50,7 +70,7 @@ void Tab();
 %start INICIO
 
 %%
-INICIO:            ALGO { printf("Sucesso!\n"); };
+INICIO:            { fprintf(output, "%s", header); } ALGO { printf("Sucesso!\n"); PrintVarTable(); };
 ALGO:              pr_algoritmo identificador { free($2); } PROCS pr_inicio DECL CMDS pr_fim_algo;
 DECL:              pr_declare L_IDS dois_pontos TIPO ponto_virgula DECL
                    | %empty;
@@ -62,15 +82,15 @@ COMP:              abre_col DIM fecha_col
 DIM:               num_inteiro ponto ponto num_inteiro DIMS;
 DIMS:              virgula DIM
                    | %empty;
-TIPO:              pr_logico
-                   | pr_caracter
-                   | pr_inteiro
-                   | pr_real
+TIPO:              pr_logico { AddVarType(TIPO_LOGICO); }
+                   | pr_caracter { AddVarType(TIPO_CARACTER); }
+                   | pr_inteiro { AddVarType(TIPO_INTEIRO); }
+                   | pr_real { AddVarType(TIPO_REAL); }
                    | identificador { CheckVarTable($1); }
                    | REG;
-REG:               pr_registro abre_par DECL fecha_par;
+REG:               pr_registro  { AddVarType(TIPO_REGISTRO); } abre_par DECL fecha_par;
 
-CMDS:              pr_leia VAR { Tab(); fprintf(output, "%s = input()\n", $2); free($2); } CMDS
+CMDS:              pr_leia VAR { Tab(); fprintf(output, "%s = %s(input())\n", $2, PrintVarType($2)); free($2); } CMDS
                    | pr_escreva L_ESC { Tab(); fprintf(output, "print(%s)\n", $2); free($2);} CMDS
                    | identificador { CheckVarTable($1); } op_atrib EXP { Tab(); fprintf(output, "%s = %s\n", $1, $4); free($1); free($4); } CMDS
                    | pr_se COND pr_entao { Tab(); fprintf(output, "if %s:\n", $2); free($2); nivel++; } CMDS { nivel--; } SEN pr_fim_se CMDS
@@ -148,13 +168,21 @@ COND:              abre_par EXP_L fecha_par { asprintf(&$$, "(%s)", $2); free($2
 %%
 
 void AddVarTable(char* var) {
-    var_table.push_back(var);
+    var_table[var] = TIPO_VOID;
+}
+
+void AddVarType(int type) {
+    auto it = var_table.rbegin();
+    while(it != var_table.rend() && it->second == TIPO_VOID) {
+        it->second = type;
+        it++;
+    }
 }
 
 void CheckVarTable(char* var) {
     auto it = var_table.begin();
     while(it != var_table.end()) {
-        if(!strcmp(*it, var)) {
+        if(!strcmp(it->first, var)) {
             return;
         }
         it++;
@@ -169,11 +197,38 @@ void PrintVarTable() {
     printf("Lista de Variaveis\n");
     auto it = var_table.begin();
     while(it != var_table.end()) {
-        printf("%s\n", *it);
-        free(*it);
+        printf("%s [%d]\n", it->first, it->second);
+        free(it->first);
         it++;
     }
     printf("----\n");
+}
+
+const char* PrintVarType(char* var) {
+    char buffer[50];
+    auto it = var_table.begin();
+    sscanf(var, "%[^\[]", buffer);
+    while(it != var_table.end()) {
+        if(!strcmp(it->first, buffer)) {
+            switch (it->second) {
+                case TIPO_LOGICO:
+                    return str_logico;
+                case TIPO_INTEIRO:
+                    return str_inteiro;
+                case TIPO_REAL:
+                    return str_real;
+                case TIPO_CARACTER:
+                    return str_caracter;
+                case TIPO_REGISTRO:
+                    return str_registro;
+                default:
+                    return str_caracter;
+            }
+        }
+        it++;
+    }
+    printf("Erro! ->%s,%s\n", var, buffer);
+    exit(-1);
 }
 
 void Tab() {

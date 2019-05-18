@@ -58,7 +58,7 @@ inicio
 			escreva "ALUNO REPROVADO!\n"
 		fim_se
 
-		escreva "Fim do acesso do usuário ", nome, ".\n"
+		escreva "Fim do acesso do usuario ", nome, ".\n"
 
 	senao
 		escreva "Quantidade de alunos invalida!!"
